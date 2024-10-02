@@ -1,6 +1,6 @@
 const express = require('express')
 const app = express()
-const { MongoClient, ServerApiVersion } = require('mongodb');
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
 const cors = require("cors");
 // const jwt = require('jsonwebtoken');
 require('dotenv').config();
@@ -27,7 +27,12 @@ const client = new MongoClient(uri, {
 
 async function run() {
   try {
+    //---============Cullection=======DataBase==========---
+    //-----------RoomsCullection------------
     const roomsCollection = client.db('stayvista').collection('rooms')
+    
+    
+    
     //-----Get-----all-----rooms-----from-----db------
     app.get('/rooms', async (req, res) => {
       const category = req.query.category
@@ -36,7 +41,16 @@ async function run() {
       if (category && category !== 'null') query = { category }
       const result = await roomsCollection.find(query).toArray()
       res.send(result)
+    });
+
+    //------Post---Added a room data in database-------
+    app.post('/room', async (req, res) => {
+      const roomData = req.body;
+      const result = await roomsCollection.insertOne(roomData);
+      res.send(result)
     })
+
+
 
     //----Get----a----single----room----data----from----db----using----_id-----
     app.get('/room/:id', async (req, res) => {
@@ -44,7 +58,7 @@ async function run() {
       const query = { _id: new ObjectId(id) }
       const result = await roomsCollection.findOne(query)
       res.send(result)
-    })
+    });
 
 
 
