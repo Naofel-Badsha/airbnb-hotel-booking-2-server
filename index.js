@@ -1,9 +1,9 @@
 const express = require('express')
+const cors = require('cors')
 const app = express()
-const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
-const cors = require("cors");
-// const jwt = require('jsonwebtoken');
 require('dotenv').config();
+const { MongoClient, ServerApiVersion, ObjectId } = require('mongodb');
+// const jwt = require('jsonwebtoken');
 const port = process.env.PORT || 5000
 
 //--------middelware---
@@ -47,6 +47,22 @@ async function run() {
     app.post('/room', async (req, res) => {
       const roomData = req.body;
       const result = await roomsCollection.insertOne(roomData);
+      res.send(result)
+    })
+
+    //-----Get-----all-----rooms-----for-----host------
+    app.get('/myListings/:email', async (req, res) => {
+      const email = req.params.email
+      let query = {'host.email' : email}
+      const result = await roomsCollection.find(query).toArray()
+      res.send(result)
+    });
+
+    //-----Deleted----Room------Data------
+    app.delete('/room/:id', async ( req, res) => {
+      const id = req.params.id;
+      const query = {_id: new ObjectId(id)}
+      const result = await roomsCollection.deleteOne(query)
       res.send(result)
     })
 
